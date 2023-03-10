@@ -1,44 +1,49 @@
 package ru.hogwarts.school.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.model.Faculty;
+import ru.hogwarts.school.repository.FacultyRepository;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class HouseService {
-    private final Map<Long, Faculty> faculties;
-    private Long generatedFacultyId;
 
-    public HouseService() {
-        this.faculties = new HashMap<>();
-        this.generatedFacultyId = 1L;
+    private FacultyRepository facultyRepository;
+
+    @Autowired
+    public HouseService(FacultyRepository facultyRepository) {
+        this.facultyRepository = facultyRepository;
     }
 
+
     public Faculty createFaculty(Faculty faculty) {
-        faculty.setId(generatedFacultyId);
-        faculties.put(generatedFacultyId, faculty);
-        generatedFacultyId++;
+        faculty.setId(null);
+        facultyRepository.save(faculty);
         return faculty;
     }
 
     public Faculty getFaculty(Long facultyId) {
-        return faculties.get(facultyId);
+        return facultyRepository.getReferenceById(facultyId);
     }
 
-    public Faculty updateFaculty(Long facultyId, Faculty faculty) {
-        faculties.put(facultyId, faculty);
+    public Faculty updateFaculty(Faculty faculty) {
+        facultyRepository.save(faculty);
         return faculty;
     }
 
     public Faculty deleteFaculty(Long facultyId) {
-        return faculties.remove(facultyId);
+        Faculty faculty = facultyRepository.getReferenceById(facultyId);
+        facultyRepository.deleteById(facultyId);
+        return faculty;
     }
 
     public List<Faculty> getAllFaculties() {
-        return faculties.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList());
+        return facultyRepository.findAll();
+    }
+
+    public List<Faculty> findFacultiesByColor(String color){
+        return facultyRepository.findFacultiesByColor(color);
     }
 }

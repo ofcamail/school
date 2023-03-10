@@ -6,7 +6,6 @@ import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.service.HouseService;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 @RequestMapping("api")
 @RestController
@@ -34,7 +33,7 @@ public class HouseController {
 
     @PutMapping("/faculty")
     public ResponseEntity<Faculty> updateFaculty(@RequestBody Faculty faculty) {
-        Faculty updatedFaculty = houseService.updateFaculty(faculty.getId(), faculty);
+        Faculty updatedFaculty = houseService.updateFaculty(faculty);
         return ResponseEntity.ok(updatedFaculty);
     }
 
@@ -49,8 +48,6 @@ public class HouseController {
 
     @GetMapping("/faculties")
     public ResponseEntity<Collection<Faculty>> getAllStudentsByAge(@RequestParam String color) {
-        return ResponseEntity.ok(houseService.getAllFaculties().stream()
-                .filter(student -> student.getColor().equals(color))
-                .collect(Collectors.toList()));
+        return ResponseEntity.ok(houseService.findFacultiesByColor(color));
     }
 }
