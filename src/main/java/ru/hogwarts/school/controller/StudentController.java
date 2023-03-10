@@ -47,6 +47,7 @@ public class StudentController {
         return ResponseEntity.ok(student);
     }
 
+
     @GetMapping("/students")
     public ResponseEntity<Collection<Student>> getAllStudentsByAge(@RequestParam int age) {
         return ResponseEntity.ok(studentService.getAllStudents().stream()
