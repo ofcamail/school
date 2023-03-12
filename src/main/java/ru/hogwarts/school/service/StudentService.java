@@ -2,47 +2,69 @@ package ru.hogwarts.school.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.hogwarts.school.dto.FacultyDTO;
+import ru.hogwarts.school.dto.StudentDTO;
 import ru.hogwarts.school.model.Student;
+import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.repository.StudentRepository;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class StudentService {
 
-    private StudentRepository studentRepository;
+    private final StudentRepository studentRepository;
+    private final FacultyRepository facultyRepository;
+    private final MappingUtils mappingUtils;
+
 
     @Autowired
-    public StudentService(StudentRepository studentRepository) {
+    public StudentService(StudentRepository studentRepository, FacultyRepository facultyRepository, MappingUtils mappingUtils) {
         this.studentRepository = studentRepository;
+        this.facultyRepository = facultyRepository;
+        this.mappingUtils = mappingUtils;
     }
 
-    public Student createStudent(Student student) {
+    public StudentDTO createStudent(StudentDTO student) {
         student.setId(null);
-        studentRepository.save(student);
+        studentRepository.save(mappingUtils.mapFromDTOtoStudent(student));
         return student;
     }
 
-    public Student getStudent(Long studentId) {
-        return studentRepository.getReferenceById(studentId);
+    public StudentDTO findStudent(Long studentId) {
+        return mappingUtils.mapFromStudentToDTO(Objects.requireNonNull(studentRepository.findById(studentId).orElse(null)));
     }
 
-    public Student updateStudent(Student student) {
-        studentRepository.save(student);
+    public StudentDTO updateStudent(StudentDTO student) {
+        studentRepository.save(mappingUtils.mapFromDTOtoStudent(student));
         return student;
     }
 
-    public Student deleteStudent(Long studentId) {
-        Student student = studentRepository.getReferenceById(studentId);
+    public StudentDTO deleteStudent(Long studentId) {
+        StudentDTO student = mappingUtils.mapFromStudentToDTO(Objects.requireNonNull(studentRepository.findById(studentId).orElse(null)));
         studentRepository.deleteById(studentId);
         return student;
     }
 
-    public List<Student> getAllStudents() {
-        return studentRepository.findAll();
+    public List<StudentDTO> findAllStudents() {
+        return studentRepository.findAll().stream().map(mappingUtils::mapFromStudentToDTO).collect(Collectors.toList());
     }
 
-    public List<Student> findStudentsByAge(int age){
+    public List<StudentDTO> findStudentsByAge(int age) {
         return studentRepository.findStudentsByAge(age);
+    }
+
+    public List<StudentDTO> findByAgeBetween(int ageMin, int ageMax) {
+        return studentRepository.findByAgeBetween(ageMin, ageMax);
+    }
+
+    public FacultyDTO getFacultyByIdStudent(Long studentId) {
+        return mappingUtils.mapFromFacultyToDTO(
+                Objects.requireNonNull(
+                        facultyRepository.findById
+                                        (Objects.requireNonNull(studentRepository.findById(studentId).orElse(null)).getFaculty().getId())
+                                .orElse(null)));
     }
 }
