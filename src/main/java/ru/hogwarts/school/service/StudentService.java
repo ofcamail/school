@@ -1,44 +1,48 @@
 package ru.hogwarts.school.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.model.Student;
+import ru.hogwarts.school.repository.StudentRepository;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class StudentService {
-    private final Map<Long, Student> students;
-    private Long generatedStudentId;
 
-    public StudentService() {
-        this.students =  new HashMap<>();
-        this.generatedStudentId = 1L;
+    private StudentRepository studentRepository;
+
+    @Autowired
+    public StudentService(StudentRepository studentRepository) {
+        this.studentRepository = studentRepository;
     }
 
     public Student createStudent(Student student) {
-        student.setId(generatedStudentId);
-        students.put(generatedStudentId, student);
-        generatedStudentId++;
+        student.setId(null);
+        studentRepository.save(student);
         return student;
     }
 
     public Student getStudent(Long studentId) {
-        return students.get(studentId);
+        return studentRepository.getReferenceById(studentId);
     }
 
-    public Student updateStudent(Long studentId, Student student) {
-        students.put(studentId, student);
+    public Student updateStudent(Student student) {
+        studentRepository.save(student);
         return student;
     }
 
     public Student deleteStudent(Long studentId) {
-        return students.remove(studentId);
+        Student student = studentRepository.getReferenceById(studentId);
+        studentRepository.deleteById(studentId);
+        return student;
     }
 
     public List<Student> getAllStudents() {
-        return students.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList());
+        return studentRepository.findAll();
+    }
+
+    public List<Student> findStudentsByAge(int age){
+        return studentRepository.findStudentsByAge(age);
     }
 }

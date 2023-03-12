@@ -6,7 +6,6 @@ import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.StudentService;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 @RequestMapping("api")
 @RestController
@@ -34,23 +33,22 @@ public class StudentController {
 
     @PutMapping("/student")
     public ResponseEntity<Student> updateStudent(@RequestBody Student student) {
-        Student updatedStudent = studentService.updateStudent(student.getId(), student);
+        Student updatedStudent = studentService.updateStudent(student);
         return ResponseEntity.ok(updatedStudent);
     }
 
     @DeleteMapping("/student/{studentId}")
     public ResponseEntity<Student> deleteStudent(@PathVariable Long studentId) {
-        Student student = studentService.deleteStudent(studentId);
-        if (student == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(student);
+//        Student student = studentService.deleteStudent(studentId);
+        studentService.deleteStudent(studentId);
+//        if (student == null) {
+//            return ResponseEntity.notFound().build();
+//        }
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/students")
     public ResponseEntity<Collection<Student>> getAllStudentsByAge(@RequestParam int age) {
-        return ResponseEntity.ok(studentService.getAllStudents().stream()
-                .filter(student -> student.getAge() == age)
-                .collect(Collectors.toList()));
+        return ResponseEntity.ok(studentService.findStudentsByAge(age));
     }
 }
