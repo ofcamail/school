@@ -59,6 +59,7 @@ public class HouseController {
         return ResponseEntity.ok(houseService.findAllFaculties());
     }
 
+
     @GetMapping("/faculty/students")
     public ResponseEntity<Collection<StudentDTO>> getStudentsByFacultyId(Long facultyId) {
         return ResponseEntity.ok(houseService.getStudentsByFacultyId(facultyId));
