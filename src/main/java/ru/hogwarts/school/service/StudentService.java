@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.dto.FacultyDTO;
 import ru.hogwarts.school.dto.StudentDTO;
-import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.repository.StudentRepository;
 
@@ -14,7 +13,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class StudentService {
-
     private final StudentRepository studentRepository;
     private final FacultyRepository facultyRepository;
     private final MappingUtils mappingUtils;
@@ -53,11 +51,11 @@ public class StudentService {
     }
 
     public List<StudentDTO> findStudentsByAge(int age) {
-        return studentRepository.findStudentsByAge(age);
+        return studentRepository.findStudentsByAge(age).stream().map(mappingUtils::mapFromStudentToDTO).collect(Collectors.toList());
     }
 
     public List<StudentDTO> findByAgeBetween(int ageMin, int ageMax) {
-        return studentRepository.findByAgeBetween(ageMin, ageMax);
+        return studentRepository.findByAgeBetween(ageMin, ageMax).stream().map(mappingUtils::mapFromStudentToDTO).collect(Collectors.toList());
     }
 
     public FacultyDTO getFacultyByIdStudent(Long studentId) {

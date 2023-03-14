@@ -11,9 +11,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+
 @Service
 public class HouseService {
-
     private final FacultyRepository facultyRepository;
     private final StudentRepository studentRepository;
     private final MappingUtils mappingUtils;
@@ -24,7 +24,6 @@ public class HouseService {
         this.studentRepository = studentRepository;
         this.mappingUtils = mappingUtils;
     }
-
 
     public FacultyDTO createFaculty(FacultyDTO faculty) {
         faculty.setId(null);
@@ -52,17 +51,16 @@ public class HouseService {
     }
 
     public List<FacultyDTO> findFacultiesByColor(String color) {
-        return facultyRepository.findFacultiesByColor(color);
+        return facultyRepository.findFacultiesByColor(color).stream().map(mappingUtils::mapFromFacultyToDTO).collect(Collectors.toList());
     }
 
     public List<FacultyDTO> findFacultyByName(String name) {
-        return facultyRepository.findFacultyByName(name);
+        return facultyRepository.findFacultyByName(name).stream().map(mappingUtils::mapFromFacultyToDTO).collect(Collectors.toList());
     }
 
     public List<StudentDTO> getStudentsByFacultyId(Long facultyId) {
-        return studentRepository.findAll().stream()
+        return studentRepository.findAllByFacultyId(facultyId).stream()
                 .map(mappingUtils::mapFromStudentToDTO)
-                .filter(student -> student.getFacultyId()
-                        .equals(facultyId)).collect(Collectors.toList());
+                .collect(Collectors.toList());
     }
 }
